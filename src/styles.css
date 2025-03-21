@@ -1,1 +1,47 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+a {
+    cursor: pointer;
+}
+
+.loader {
+  height: 12px;
+  width: 12px;
+  aspect-ratio: square;
+  border: 5px dotted #FFF;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  box-sizing: border-box;
+  animation: rotation 2s linear infinite;
+}
+
+.larger-loader {
+  height: 48px;
+  width: 48px;
+  aspect-ratio: square;
+  border: 5px dotted #1A8A9E;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  box-sizing: border-box;
+  animation: rotation 2s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} 
+
+.custom-bg {
+  background-image: url('/assets/bg.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+}

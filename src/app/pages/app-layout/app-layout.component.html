@@ -1,0 +1,58 @@
+<div class="flex h-screen bg-gray-100">
+  <!-- Sidebar -->
+  <aside
+    class="fixed inset-y-0 left-0 z-30 w-64 bg-mint p-4 flex flex-col transition-transform duration-300 md:relative md:translate-x-0"
+    [class.-translate-x-full]="!sidebarOpen()"
+  >
+    <div
+      *ngIf="sidebarOpen()"
+      class="text-white text-xl font-bold mb-6 text-center"
+    >
+      Market Connect
+    </div>
+
+    <!-- Sidebar Links -->
+    <nav class="flex-1 font-semibold md:mt-12">
+      <ul>
+        <li *ngFor="let item of filteredMenuItems()">
+          <a
+            [routerLink]="item.path"
+            routerLinkActive="bg-skobeloff"
+            class="block py-2 px-4 text-white hover:bg-turquoise rounded transition mb-4"
+          >
+            <span (click)="toggleSidebar()">{{ item.label }}</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Logout Button at Bottom -->
+    <button
+      class="mt-auto w-full text-left text-white py-2 px-4 bg-red-600 hover:bg-red-700 rounded flex font-bold"
+      (click)="logout()"
+    >
+      <mat-icon class="mr-2">logout</mat-icon>
+      Logout
+    </button>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex flex-col flex-1">
+    <!-- Navbar -->
+    <nav
+      class="bg-white shadow-md p-4 flex justify-between items-center relative"
+    >
+      <button class="md:hidden text-white z-50" (click)="toggleSidebar()">
+        <span *ngIf="!sidebarOpen()" class="text-mint">☰</span>
+        <span *ngIf="sidebarOpen()" class="text-white">✖</span>
+      </button>
+      <div class="text-xl font-bold text-skobeloff">Market Connect</div>
+      <div class="text-black font-medium">Hello, {{ user()?.name }}</div>
+    </nav>
+
+    <!-- Content Wrapper -->
+    <main class="flex-1 p-6 overflow-auto">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

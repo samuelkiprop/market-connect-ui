@@ -1,0 +1,76 @@
+<div class="p-6">
+  <h1 class="text-2xl font-bold text-mint mb-4">Users</h1>
+
+  <!-- Loading State -->
+  <div *ngIf="loading()" class="text-center text-blue-munsell">
+    <span class="larger-loader text-blue-munsell"></span>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error()" class="text-red-600 text-center">{{ error() }}</div>
+
+  <div *ngIf="!loading() && users().length > 0" class="overflow-x-auto">
+    <table class="w-full border-collapse border border-gray-300">
+      <thead class="bg-skobeloff text-white">
+        <tr>
+          <th class="p-2 border border-gray-300">Name</th>
+          <th class="p-2 border border-gray-300">Email</th>
+          <th class="p-2 border border-gray-300">Role</th>
+          <th class="p-2 border border-gray-300">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users()" class="text-center">
+          <td class="p-2 border border-gray-300">{{ user.name }}</td>
+          <td class="p-2 border border-gray-300">{{ user.email }}</td>
+          <td class="p-2 border border-gray-300 capitalize">{{ user.role }}</td>
+          <td class="p-2 border border-gray-300">
+            <button
+              class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700"
+              (click)="openDeleteModal(user)"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div
+    *ngIf="!loading() && users().length === 0"
+    class="text-center text-gray-600"
+  >
+    No users found.
+  </div>
+</div>
+
+<!-- Delete User Modal -->
+<div
+  *ngIf="isDeleteModalOpen"
+  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+>
+  <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+    <h2 class="text-lg font-bold text-black mb-4">Confirm Deletion</h2>
+    <p class="text-gray-700">
+      Are you sure you want to delete <strong>{{ selectedUser?.name }}</strong
+      >?
+    </p>
+
+    <div class="flex justify-end mt-4 space-x-2">
+      <button
+        class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-600"
+        (click)="closeDeleteModal()"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-800"
+        (click)="confirmDelete()"
+      >
+        Confirm Delete
+      </button>
+    </div>
+  </div>
+</div>

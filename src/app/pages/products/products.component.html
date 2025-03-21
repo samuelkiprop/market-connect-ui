@@ -1,0 +1,267 @@
+<div class="p-6">
+  <h1 class="text-2xl font-bold text-mint mb-4">Products</h1>
+
+  <!-- Add Product (Only for Merchant & Admin) -->
+  <button
+    *ngIf="userRole === 'merchant' || userRole === 'admin'"
+    class="mb-4 px-4 py-2 bg-mint text-white rounded hover:bg-skobeloff"
+    (click)="openAddModal()"
+  >
+    + Add Product
+  </button>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="grid place-items-center">
+    <span class="larger-loader"></span>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div
+      *ngFor="let product of products"
+      class="border rounded-lg p-4 shadow-md"
+    >
+      <h2 class="text-lg font-bold">{{ product.name }}</h2>
+      <p class="text-gray-700">{{ product.description }}</p>
+      <p class="text-blue-munsell font-semibold mt-2">${{ product.price }}</p>
+      <p class="text-sm text-gray-600">Merchant: {{ product.merchant.name }}</p>
+
+      <div class="flex justify-between">
+        <div>
+          <!-- Customer: Buy -->
+          <button
+            *ngIf="
+              userRole === 'customer' ||
+              userRole === 'affiliate' ||
+              userRole === 'admin'
+            "
+            class="mt-2 mr-2 px-4 py-2 bg-turquoise text-white rounded hover:bg-blue-munsell font-bold h-full"
+            (click)="openBuyModal(product)"
+          >
+            Buy
+          </button>
+
+          <!-- Affiliate: Promote -->
+          <button
+            *ngIf="userRole === 'affiliate' || userRole === 'admin'"
+            class="mt-2 px-4 py-2 bg-skobeloff text-white rounded hover:bg-black font-bold h-full"
+            (click)="createAffiliateLink(product)"
+          >
+            Promote
+          </button>
+        </div>
+        <div>
+          <!-- Merchant: Update -->
+          <button
+            *ngIf="userRole === 'merchant' || userRole === 'admin'"
+            class="mt-2 px-4 py-2 bg-mint text-white rounded hover:bg-skobeloff mr-2 h-full"
+            (click)="openUpdateModal(product)"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+
+          <!-- Merchant: Delete -->
+          <button
+            *ngIf="userRole === 'merchant' || userRole === 'admin'"
+            class="mt-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700 h-full"
+            (click)="openDeleteModal(product)"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Buy Product Modal -->
+<div
+  *ngIf="isBuyModalOpen"
+  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+>
+  <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+    <h2 class="text-lg font-bold text-black mb-4">Buy Product</h2>
+    <p>Select Affiliate (if applicable):</p>
+    <select [(ngModel)]="affiliateId" class="w-full border p-2 rounded mt-2">
+      <option *ngFor="let affiliate of affiliates" [value]="affiliate.id">
+        {{ affiliate.name }}
+      </option>
+    </select>
+
+    <div class="flex justify-end mt-4 space-x-2">
+      <button
+        class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-600"
+        (click)="closeBuyModal()"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="px-4 py-2 bg-mint text-white rounded hover:bg-skobeloff"
+        (click)="buyProduct(selectedProduct!)"
+      >
+        Buy Now
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- update product modal -->
+<div
+  *ngIf="isUpdateModalOpen"
+  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+>
+  <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+    <h2 class="text-lg font-bold text-black mb-4">Update Product</h2>
+    <input
+      [(ngModel)]="selectedProduct!.name"
+      class="w-full border p-2 rounded mb-2"
+      placeholder="Product Name"
+    />
+
+    <input
+      [(ngModel)]="selectedProduct!.price"
+      type="number"
+      class="w-full border p-2 rounded mb-2"
+      placeholder="Price"
+    />
+
+    <textarea
+      [(ngModel)]="selectedProduct!.description"
+      class="w-full border p-2 rounded mb-2"
+      placeholder="Description"
+    >
+    </textarea>
+
+    <div class="flex justify-end mt-4 space-x-2">
+      <button
+        class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-600"
+        (click)="closeUpdateModal()"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="px-4 py-2 bg-mint text-white rounded hover:bg-skobeloff"
+        (click)="updateProduct()"
+      >
+        Update Product
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Product Modal -->
+<div
+  *ngIf="isDeleteModalOpen"
+  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+>
+  <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+    <h2 class="text-lg font-bold text-black mb-4">Confirm Deletion</h2>
+    <p class="text-gray-700">
+      Are you sure you want to delete
+      <strong>{{ selectedProduct?.name }}</strong
+      >?
+    </p>
+
+    <div class="flex justify-end mt-4 space-x-2">
+      <button
+        class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-600"
+        (click)="closeDeleteModal()"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-800"
+        (click)="deleteProduct()"
+      >
+        Confirm Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Product Modal -->
+<div
+  *ngIf="isAddModalOpen"
+  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+>
+  <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+    <h2 class="text-lg font-bold text-black mb-4">Add Product</h2>
+    <input
+      [(ngModel)]="newProduct.name"
+      class="w-full border p-2 rounded mb-2"
+      placeholder="Product Name"
+    />
+
+    <input
+      [(ngModel)]="newProduct.price"
+      type="number"
+      class="w-full border p-2 rounded mb-2"
+      placeholder="Price"
+    />
+
+    <textarea
+      [(ngModel)]="newProduct.description"
+      class="w-full border p-2 rounded mb-2"
+      placeholder="Description"
+    >
+    </textarea>
+
+    <div class="flex justify-end mt-4 space-x-2">
+      <button
+        class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-600"
+        (click)="closeAddModal()"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="px-4 py-2 bg-mint text-white rounded hover:bg-skobeloff"
+        (click)="addProduct()"
+      >
+        Add Product
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Promote Product Modal -->
+<div
+  *ngIf="isPromoteProductModalOpen"
+  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+>
+  <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+    <h2 class="text-lg font-bold text-black mb-4">Promote Product</h2>
+
+    <div *ngIf="isLoading" class="text-center">
+      <p class="text-gray-700">Generating affiliate link...</p>
+      <div class="larger-loader"></div>
+    </div>
+
+    <div *ngIf="!isLoading && affiliateData" class="text-center">
+      <p class="text-gray-700">Your affiliate link is ready:</p>
+      <input
+        type="text"
+        [value]="affiliateData.id"
+        readonly
+        class="w-full border p-2 rounded mt-2"
+      />
+      <button
+        class="mt-2 px-4 py-2 bg-mint text-white rounded hover:bg-skobeloff"
+        (click)="copyAffiliateLink(affiliateData.id)"
+      >
+        Copy Link
+      </button>
+    </div>
+
+    <div class="flex justify-end mt-4 space-x-2">
+      <button
+        class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-600"
+        (click)="closePromoteProductModal()"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
